@@ -1022,7 +1022,7 @@ function sum(a) {
 
 function solve(input) {
     return sum(input.trim().split('\n').map(line => {
-        const [_, min_count, max_count, letter, password] = line.match(/(\d+)\-(\d+) (\w): (\w+)/);
+        const [_, min_count, max_count, letter, password] = line.match(/(\d+)-(\d+) (\w): (\w+)/);
         let count = 0;
         for (let c of password) {
             if (c === letter) {
