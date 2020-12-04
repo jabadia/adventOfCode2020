@@ -29,7 +29,7 @@ def is_valid(password):
 
 
 def solve(input):
-    return sum(is_valid(password) for password in input.strip().replace('\n\n', '|').split('|'))
+    return sum(is_valid(password) for password in input.strip().split('\n\n'))
 
 
 if __name__ == '__main__':

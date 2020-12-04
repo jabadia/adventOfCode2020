@@ -44,14 +44,11 @@ def is_field_valid(field_name, field_value):
         elif field_name == 'eyr':
             assert 2020 <= int(field_value) <= 2030
         elif field_name == 'hgt':
-            if field_value[-2:] == 'cm':
-                assert 150 <= int(field_value[:-2]) <= 193
-            elif field_value[-2:] == 'in':
-                assert 59 <= int(field_value[:-2]) <= 76
-            else:
-                return False
+            magnitude, units = re.match(r"(\d+)(in|cm)$", field_value).groups()
+            assert (units == 'cm' and 150 <= int(magnitude) <= 193) or (
+                        units == 'in' and 59 <= int(field_value[:-2]) <= 76)
         elif field_name == 'hcl':
-            assert re.match(r'#[0-9a-f]{6}', field_value)
+            assert re.match(r'#[0-9a-f]{6}$', field_value)
         elif field_name == 'ecl':
             assert field_value in ('amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth')
         elif field_name == 'pid':
@@ -60,7 +57,7 @@ def is_field_valid(field_name, field_value):
             pass
         else:
             return False
-    except (AssertionError, ValueError):
+    except (AssertionError, ValueError, AttributeError):
         return False
 
     return True
@@ -94,7 +91,7 @@ def is_valid(password):
 
 
 def solve(input):
-    return sum(is_valid(password) for password in input.strip().replace('\n\n', '|').split('|'))
+    return sum(is_valid(password) for password in input.strip().split('\n\n'))
 
 
 if __name__ == '__main__':
