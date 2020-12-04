@@ -35,56 +35,50 @@ eyr:2022
 REQUIRED_FIELDS = {'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid', 'cid'}
 
 
-def check_field(field_name, field_value):
+def is_field_valid(field_name, field_value):
     try:
         if field_name == 'byr':
-            if not 1920 <= int(field_value) <= 2002:
-                return False
+            assert 1920 <= int(field_value) <= 2002
         elif field_name == 'iyr':
-            if not 2010 <= int(field_value) <= 2020:
-                return False
+            assert 2010 <= int(field_value) <= 2020
         elif field_name == 'eyr':
-            if not 2020 <= int(field_value) <= 2030:
-                return False
+            assert 2020 <= int(field_value) <= 2030
         elif field_name == 'hgt':
             if field_value[-2:] == 'cm':
-                if not 150 <= int(field_value[:-2]) <= 193:
-                    return False
+                assert 150 <= int(field_value[:-2]) <= 193
             elif field_value[-2:] == 'in':
-                if not 59 <= int(field_value[:-2]) <= 76:
-                    return False
+                assert 59 <= int(field_value[:-2]) <= 76
             else:
                 return False
         elif field_name == 'hcl':
-            if not re.match(r'#[0-9a-f]{6}', field_value):
-                return False
+            assert re.match(r'#[0-9a-f]{6}', field_value)
         elif field_name == 'ecl':
-            if not field_value in ('amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'):
-                return False
+            assert field_value in ('amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth')
         elif field_name == 'pid':
-            if not re.match(r'\d{9}$', field_value):
-                return False
+            assert re.match(r'\d{9}$', field_value)
         elif field_name == 'cid':
             pass
-    except ValueError:
+        else:
+            return False
+    except (AssertionError, ValueError):
         return False
 
     return True
 
 
-assert check_field('byr', '2002')
-assert not check_field('byr', '2003')
-assert check_field('hgt', '60in')
-assert check_field('hgt', '190cm')
-assert not check_field('hgt', '190in')
-assert not check_field('hgt', '190')
-assert check_field('hcl', '#123abc')
-assert not check_field('hcl', '#123abz')
-assert not check_field('hcl', '123abc')
-assert check_field('ecl', 'brn')
-assert not check_field('ecl', 'wat')
-assert check_field('pid', '000000001')
-assert not check_field('pid', '0123456789')
+assert is_field_valid('byr', '2002')
+assert not is_field_valid('byr', '2003')
+assert is_field_valid('hgt', '60in')
+assert is_field_valid('hgt', '190cm')
+assert not is_field_valid('hgt', '190in')
+assert not is_field_valid('hgt', '190')
+assert is_field_valid('hcl', '#123abc')
+assert not is_field_valid('hcl', '#123abz')
+assert not is_field_valid('hcl', '123abc')
+assert is_field_valid('ecl', 'brn')
+assert not is_field_valid('ecl', 'wat')
+assert is_field_valid('pid', '000000001')
+assert not is_field_valid('pid', '0123456789')
 
 
 def is_valid(password):
@@ -94,8 +88,7 @@ def is_valid(password):
         return False
 
     for field_name, field_value in fields.items():
-        is_valid = check_field(field_name, field_value)
-        if not is_valid:
+        if not is_field_valid(field_name, field_value):
             return False
     return True
 
