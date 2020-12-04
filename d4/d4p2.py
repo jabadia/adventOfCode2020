@@ -45,7 +45,7 @@ VALIDATORS = {
     'byr': lambda field_value: 1920 <= int(field_value) <= 2002,
     'iyr': lambda field_value: 2010 <= int(field_value) <= 2020,
     'eyr': lambda field_value: 2020 <= int(field_value) <= 2030,
-    'hgt': lambda field_value: validate_hgt(field_value),
+    'hgt': validate_hgt,
     'hcl': lambda field_value: re.match(r'#[0-9a-f]{6}$', field_value),
     'ecl': lambda field_value: field_value in ('amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'),
     'pid': lambda field_value: re.match(r'\d{9}$', field_value),
