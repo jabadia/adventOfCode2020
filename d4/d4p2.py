@@ -32,35 +32,32 @@ eyr:2022
 """, 3),
 ]
 
-REQUIRED_FIELDS = {'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid', 'cid'}
+REQUIRED_FIELDS = {'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'}
+ALLOWED_FIELDS = REQUIRED_FIELDS.union({'cid'})
+
+
+def validate_hgt(field_value):
+    magnitude, units = re.match(r"(\d+)(in|cm)$", field_value).groups()
+    return (units == 'cm' and 150 <= int(magnitude) <= 193) or (units == 'in' and 59 <= int(field_value[:-2]) <= 76)
+
+
+VALIDATORS = {
+    'byr': lambda field_value: 1920 <= int(field_value) <= 2002,
+    'iyr': lambda field_value: 2010 <= int(field_value) <= 2020,
+    'eyr': lambda field_value: 2020 <= int(field_value) <= 2030,
+    'hgt': lambda field_value: validate_hgt(field_value),
+    'hcl': lambda field_value: re.match(r'#[0-9a-f]{6}$', field_value),
+    'ecl': lambda field_value: field_value in ('amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'),
+    'pid': lambda field_value: re.match(r'\d{9}$', field_value),
+    'cid': lambda field_value: True
+}
 
 
 def is_field_valid(field_name, field_value):
     try:
-        if field_name == 'byr':
-            assert 1920 <= int(field_value) <= 2002
-        elif field_name == 'iyr':
-            assert 2010 <= int(field_value) <= 2020
-        elif field_name == 'eyr':
-            assert 2020 <= int(field_value) <= 2030
-        elif field_name == 'hgt':
-            magnitude, units = re.match(r"(\d+)(in|cm)$", field_value).groups()
-            assert (units == 'cm' and 150 <= int(magnitude) <= 193) or (
-                        units == 'in' and 59 <= int(field_value[:-2]) <= 76)
-        elif field_name == 'hcl':
-            assert re.match(r'#[0-9a-f]{6}$', field_value)
-        elif field_name == 'ecl':
-            assert field_value in ('amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth')
-        elif field_name == 'pid':
-            assert re.match(r'\d{9}$', field_value)
-        elif field_name == 'cid':
-            pass
-        else:
-            return False
-    except (AssertionError, ValueError, AttributeError):
+        return VALIDATORS[field_name](field_value)
+    except (KeyError, ValueError, AttributeError):
         return False
-
-    return True
 
 
 assert is_field_valid('byr', '2002')
@@ -81,13 +78,11 @@ assert not is_field_valid('pid', '0123456789')
 def is_valid(password):
     fields = dict(field.split(':') for field in password.replace('\n', ' ').split(' '))
     missing_fields = REQUIRED_FIELDS.difference(fields)
-    if not (len(missing_fields) == 0 or len(missing_fields) == 1 and 'cid' in missing_fields):
-        return False
+    unexpected_fields = set(fields).difference(ALLOWED_FIELDS)
 
-    for field_name, field_value in fields.items():
-        if not is_field_valid(field_name, field_value):
-            return False
-    return True
+    return not missing_fields and not unexpected_fields and all(
+        is_field_valid(field_name, field_value) for field_name, field_value in fields.items()
+    )
 
 
 def solve(input):
