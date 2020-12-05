@@ -1,4 +1,5 @@
 from utils.test_case import TestCase
+import re
 from d5_input import INPUT
 
 TEST_CASES = [
@@ -6,9 +7,7 @@ TEST_CASES = [
 
 
 def get_boarding_pass_id(line):
-    row = int(line[:7].replace('F', '0').replace('B', '1'), 2)
-    col = int(line[-3:].replace('L', '0').replace('R', '1'), 2)
-    return row * 8 + col
+    return int(re.sub(r'[BR]', '1', re.sub(r'[FL]', '0', line)), 2)
 
 
 def solve(input):
