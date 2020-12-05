@@ -12,10 +12,13 @@ def get_boarding_pass_id(line):
 
 def solve(input):
     occuppied_seats = set(get_boarding_pass_id(line) for line in input.strip().split('\n'))
-    min_seat, max_seat = min(occuppied_seats), max(occuppied_seats)
-    for i in range(min_seat, max_seat + 1):
-        if i not in occuppied_seats:
-            return i
+    free = None
+    for seat in occuppied_seats:
+        if seat + 1 not in occuppied_seats:
+            if free:
+                return min(free, seat + 1)
+            else:
+                free = seat + 1
 
 
 if __name__ == '__main__':
