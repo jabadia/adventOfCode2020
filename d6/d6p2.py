@@ -22,18 +22,17 @@ b
 ]
 
 
+def intersection(sets):
+    first = next(sets)  # sets is a generator, we take the first element
+    return first.intersection(*sets)
+
+
 def solve(input):
-    sum = 0
-    for group in input.strip().split('\n\n'):
-        common_answers = None
-        for line in group.split('\n'):
-            answers = set(line)
-            if common_answers is not None:
-                common_answers = common_answers.intersection(answers)
-            else:
-                common_answers = answers
-        sum += len(common_answers)
-    return sum
+    return sum(
+        len(
+            intersection(set(answers) for answers in group.split('\n'))
+        ) for group in input.strip().split('\n\n')
+    )
 
 
 if __name__ == '__main__':
