@@ -1,4 +1,3 @@
-import re
 from collections import defaultdict
 
 from utils.test_case import TestCase
@@ -19,8 +18,8 @@ dotted black bags contain no other bags.
 ]
 
 
-def get_valid_colors_for(color, is_contained):
-    colors = is_contained.get(color, [])
+def get_valid_colors_for(bag, is_contained):
+    colors = is_contained.get(bag, [])
     valid_colors = set(colors)
     for other_color in colors:
         valid_colors.update(get_valid_colors_for(other_color, is_contained))
@@ -30,11 +29,11 @@ def get_valid_colors_for(color, is_contained):
 def solve(input):
     is_contained = defaultdict(list)
     for rule in input.strip().split('\n'):
-        outer, inner = rule.split(' bags contain ')
-        inner = [inner_part.split(' ')[:3] for inner_part in inner.split(', ')]
-        for inner_rule in inner:
-            count, color = inner_rule[0], ' '.join(inner_rule[1:])
-            is_contained[color].append(outer)
+        outer_bag, inner_bags = rule.split(' bags contain ')
+        inner_bags = [inner_part.split(' ')[:3] for inner_part in inner_bags.split(', ')]
+        for inner_bag in inner_bags:
+            count, bag_color = inner_bag[0], ' '.join(inner_bag[1:])
+            is_contained[bag_color].append(outer_bag)
     is_contained = dict(is_contained)
 
     return len(get_valid_colors_for('shiny gold', is_contained))
