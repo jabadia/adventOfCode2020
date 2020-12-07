@@ -1,3 +1,4 @@
+import os
 import re
 from collections import defaultdict
 
@@ -28,6 +29,23 @@ dark violet bags contain no other bags.
 ]
 
 
+def write_graph(contains):
+    graph_path = 'dependencies.gv'
+    output_path = graph_path.replace('.gv', '.pdf')
+    with open(graph_path, 'w') as graph:
+        graph.write('digraph G {\n')
+        graph.write('rankdir=LR;\n')
+        graph.write('node [shape=box];\n')
+        for outer_bag, inner_bags in contains.items():
+            for (count, inner_bag) in inner_bags:
+                graph.write(f'\t"{outer_bag}" -> "{inner_bag}" [label={count}];\n')
+        graph.write('}\n')
+    cmd = f'dot -Tpdf {graph_path} -o {output_path}'
+    os.system(cmd)
+    print(f'converted to {output_path}')
+    os.system(f'open {output_path}')
+
+
 def get_total_bags(color, contains):
     return 1 + sum(
         get_total_bags(inner_color, contains) * inner_count
@@ -45,6 +63,8 @@ def solve(input):
                 count, color = int(inner_rule[0]), ' '.join(inner_rule[1:])
                 contains[outer].append((count, color))
     contains = dict(contains)
+
+    write_graph(contains)
 
     return get_total_bags('shiny gold', contains) - 1
 
