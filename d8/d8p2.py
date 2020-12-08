@@ -59,8 +59,9 @@ def solve(input):
 
     for i, instruction in enumerate(program):
         if instruction.op in ('jmp', 'nop'):
-            modified_program = program.copy()
-            modified_program[i] = Instruction('nop' if instruction.op == 'jmp' else 'jmp', instruction.arg)
+            modified_program = program[0:i] + [
+                Instruction('nop' if instruction.op == 'jmp' else 'jmp', instruction.arg)
+            ] + program[i+1:]
             result = run(modified_program)
             if result:
                 return result
