@@ -28,7 +28,6 @@ def parse_instruction(line):
 
 
 def run(program):
-
     accumulator = 0
     pc = 0
     already_executed = set()
@@ -38,6 +37,7 @@ def run(program):
             return False
         if pc >= len(program):
             return accumulator
+
         already_executed.add(pc)
         current = program[pc]
         if current.operation == 'acc':
@@ -49,6 +49,7 @@ def run(program):
             pc += 1
         else:
             assert False, 'bad instruction'
+
 
 def solve(input):
     program = [
