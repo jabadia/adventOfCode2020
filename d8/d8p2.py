@@ -18,17 +18,17 @@ acc +6
 """, 8),
 ]
 
-Instruction = namedtuple('Instruction', 'operation argument')
+Instruction = namedtuple('Instruction', 'op arg')
 
 
 def parse_instruction(line):
-    operation, argument = re.match(r'(acc|jmp|nop) ([-+]?\d+)', line).groups()
-    argument = int(argument, 10)
-    return Instruction(operation, argument)
+    op, arg = re.match(r'(acc|jmp|nop) ([-+]?\d+)', line).groups()
+    arg = int(arg, 10)
+    return Instruction(op, arg)
 
 
 def run(program):
-    accumulator = 0
+    acc = 0
     pc = 0
     already_executed = set()
 
@@ -36,16 +36,16 @@ def run(program):
         if pc in already_executed:
             return False
         if pc >= len(program):
-            return accumulator
+            return acc
 
         already_executed.add(pc)
         current = program[pc]
-        if current.operation == 'acc':
-            accumulator += current.argument
+        if current.op == 'acc':
+            acc += current.arg
             pc += 1
-        elif current.operation == 'jmp':
-            pc += current.argument
-        elif current.operation == 'nop':
+        elif current.op == 'jmp':
+            pc += current.arg
+        elif current.op == 'nop':
             pc += 1
         else:
             assert False, 'bad instruction'
@@ -62,9 +62,9 @@ def solve(input):
         return result
 
     for i, instruction in enumerate(program):
-        if instruction.operation in ('jmp', 'nop'):
+        if instruction.op in ('jmp', 'nop'):
             modified_program = program.copy()
-            modified_program[i] = Instruction('nop' if instruction.operation == 'jmp' else 'jmp', instruction.argument)
+            modified_program[i] = Instruction('nop' if instruction.op == 'jmp' else 'jmp', instruction.arg)
             result = run(modified_program)
             if result:
                 return result
