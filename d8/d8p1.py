@@ -18,13 +18,13 @@ acc +6
 """, 5),
 ]
 
-Instruction = namedtuple('Instruction', 'operation argument')
+Instruction = namedtuple('Instruction', 'op arg')
 
 
 def parse_instruction(line):
-    operation, argument = re.match(r'(acc|jmp|nop) ([-+]?\d+)', line).groups()
-    argument = int(argument, 10)
-    return Instruction(operation, argument)
+    op, arg = re.match(r'(acc|jmp|nop) ([-+]?\d+)', line).groups()
+    arg = int(arg, 10)
+    return Instruction(op, arg)
 
 
 def solve(input):
@@ -42,12 +42,12 @@ def solve(input):
             return accumulator
         already_executed.add(pc)
         current = program[pc]
-        if current.operation == 'acc':
-            accumulator += current.argument
+        if current.op == 'acc':
+            accumulator += current.arg
             pc += 1
-        elif current.operation == 'jmp':
-            pc += current.argument
-        elif current.operation == 'nop':
+        elif current.op == 'jmp':
+            pc += current.arg
+        elif current.op == 'nop':
             pc += 1
         else:
             assert False, 'bad instruction'
