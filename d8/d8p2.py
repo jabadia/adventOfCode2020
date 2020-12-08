@@ -57,10 +57,6 @@ def solve(input):
         for line in input.strip().split('\n')
     ]
 
-    result = run(program)
-    if result:
-        return result
-
     for i, instruction in enumerate(program):
         if instruction.op in ('jmp', 'nop'):
             modified_program = program.copy()
