@@ -28,13 +28,6 @@ TEST_CASES = [
 """, 127), 62),
 ]
 
-def sum_in_preamble(numbers, i, preamble_len):
-    for p0 in range(i - preamble_len, i):
-        for p1 in range(p0 + 1, i):
-            if numbers[p0] + numbers[p1] == numbers[i]:
-                return True
-    return False
-
 
 def solve(input, target):
     numbers = [int(n) for n in input.strip().split('\n')]
