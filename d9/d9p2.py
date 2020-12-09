@@ -1,5 +1,3 @@
-from collections import deque
-
 from utils.test_case import TestCase
 from d9_input import INPUT
 
@@ -32,15 +30,14 @@ TEST_CASES = [
 def solve(input, target):
     numbers = [int(n) for n in input.strip().split('\n')]
     sum = 0
-    preamble = deque()
+    i0 = 0
     for i in range(0, len(numbers)):
         if sum == target:
-            return min(preamble) + max(preamble)
+            return min(numbers[i0:i]) + max(numbers[i0:i])
         sum += numbers[i]
-        preamble.append(numbers[i])
         while sum > target:
-            discard = preamble.popleft()
-            sum -= discard
+            sum -= numbers[i0]
+            i0 += 1
 
     return None
 
@@ -51,4 +48,4 @@ if __name__ == '__main__':
         case.check(result)
 
     target = 776203571
-    print(solve(INPUT, target))
+    print(solve(INPUT, target))  # 104800569
