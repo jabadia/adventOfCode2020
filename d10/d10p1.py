@@ -27,10 +27,10 @@ def solve(input):
         3: 0,
     }
     for i in range(1, len(adapters)):
-        diff = adapters[i] - adapters[i-1]
+        diff = adapters[i] - adapters[i - 1]
         counts[diff] += 1
 
-    return counts[1] * (1+counts[3])
+    return counts[1] * (1 + counts[3])
 
 
 if __name__ == '__main__':
