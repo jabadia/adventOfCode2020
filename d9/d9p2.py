@@ -28,7 +28,16 @@ TEST_CASES = [
 ]
 
 
-def solve(input, target):
+def solve_n3(input, target):
+    numbers = [int(n) for n in input.strip().split('\n')]
+    for i in range(1, len(numbers)):
+        for i0 in range(i):
+            if target == sum(numbers[i0:i]):
+                return min(numbers[i0:i]) + max(numbers[i0:i])
+    return None
+
+
+def solve_n(input, target):
     numbers = [int(n) for n in input.strip().split('\n')]
     sum = 0
     i0 = 0
@@ -42,6 +51,8 @@ def solve(input, target):
 
     return None
 
+
+solve = solve_n
 
 if __name__ == '__main__':
     for case in TEST_CASES:
