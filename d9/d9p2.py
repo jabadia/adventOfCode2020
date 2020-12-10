@@ -1,3 +1,4 @@
+import time
 from utils.test_case import TestCase
 from d9_input import INPUT
 
@@ -48,4 +49,7 @@ if __name__ == '__main__':
         case.check(result)
 
     target = 776203571
+    t0 = time.time()
     print(solve(INPUT, target))  # 104800569
+    t1 = time.time()
+    print(f"{(t1 - t0) * 1000:0.1f} ms")

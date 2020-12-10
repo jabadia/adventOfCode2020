@@ -1,5 +1,4 @@
-from collections import deque
-
+import time
 from utils.test_case import TestCase
 from d9_input import INPUT
 
@@ -81,4 +80,7 @@ if __name__ == '__main__':
         result = solve(*case.case)
         case.check(result)
 
+    t0 = time.time()
     print(solve(INPUT, 25))
+    t1 = time.time()
+    print(f"{(t1-t0) * 1000:0.1f} ms")
