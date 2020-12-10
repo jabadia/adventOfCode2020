@@ -5,6 +5,7 @@ class TestCase(object):
 
     def check(self, actual):
         if self.expected == actual:
-            print("OK %s" % (self.case,))
+            case = repr(self.case).strip().replace(r'\n', ' ')
+            print("OK %s %s%s" % (self.expected, case[:100], '...' if len(case) > 100 else ''))
         else:
             print("FAIL %s, expected %s, got %s" % (self.case, self.expected, actual))
