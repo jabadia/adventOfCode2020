@@ -110,7 +110,7 @@ def next_generation(ferry, neighbours):
                 next_row.append('#' if visible_seats(ferry, neighbours, row, col) == 0 else 'L')
             elif ferry[row][col] == '#':
                 next_row.append('#' if visible_seats(ferry, neighbours, row, col) < 5 else 'L')
-        next_ferry.append(''.join(next_row))
+        next_ferry.append(next_row)
     return next_ferry
 
 
@@ -154,7 +154,7 @@ def get_hash(ferry):
 
 
 def solve(input):
-    ferry = input.strip().split('\n')
+    ferry = [list(row) for row in input.strip().split('\n')]
     last_hash = None
     iteration = 0
     neighbours = find_neighbours(ferry)
