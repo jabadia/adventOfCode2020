@@ -31,6 +31,7 @@ def find_neighbours(ferry):
                 continue
 
             key = (row, col)
+
             # north
             i = row - 1
             while i >= 0 and ferry[i][col] == '.':
@@ -98,30 +99,6 @@ def visible_seats(ferry, neighhbours, row, col):
 def next_generation(ferry, neighbours):
     rows = len(ferry)
     cols = len(ferry[0])
-    # visible_seats = [[0] * cols for _ in range(rows)]
-    # for row in range(rows):
-    #     for col in range(cols):
-    #         if ferry[row][col] != '#':
-    #             continue
-    #         # increment row
-    #         for j in range(0, cols):
-    #             visible_seats[row][j] += 1
-    #         # increment col
-    #         for i in range(0, rows):
-    #             visible_seats[i][col] += 1
-    #         # increment diagonals
-    #         for i in range(0, rows):
-    #             j1 = i - row + col
-    #             if 0 <= j1 < cols:
-    #                 visible_seats[i][j1] += 1
-    #             j2 = col - (i - row)
-    #             if 0 <= j2 < cols:
-    #                 visible_seats[i][j2] += 1
-    #         visible_seats[row][col] -= 4
-    #
-    # if test:
-    #     test_row, test_col, expected_visible = test
-    #     assert visible_seats[test_row][test_col] == expected_visible
 
     next_ferry = []
     for row in range(rows):
@@ -183,9 +160,6 @@ def solve(input):
     neighbours = find_neighbours(ferry)
     while True:
         ferry = next_generation(ferry, neighbours)
-        # print()
-        # for row in ferry:
-        #     print(row)
         hash = get_hash(ferry)
         if hash == last_hash:
             return sum(row.count('#') for row in ferry)
