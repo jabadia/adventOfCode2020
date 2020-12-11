@@ -81,6 +81,7 @@ def test_visible(ferry, row, col, expected_visible):
     assert actual_visible == expected_visible
     print('ok')
 
+
 test_visible([
     ".......#.",
     "...#.....",
@@ -110,22 +111,16 @@ test_visible([
 ], 3, 3, 0)
 
 
-def get_hash(ferry):
-    return sum(i * sum(j for j, cell in enumerate(row) if cell == '#') for i, row in enumerate(ferry))
-
-
 def solve(input):
     ferry = [list(row) for row in input.strip().split('\n')]
-    last_hash = None
     iteration = 0
     neighbours = find_neighbours(ferry)
     while True:
-        ferry = next_generation(ferry, neighbours)
-        hash = get_hash(ferry)
-        if hash == last_hash:
+        next_ferry = next_generation(ferry, neighbours)
+        if next_ferry == ferry:
             return sum(row.count('#') for row in ferry)
-        last_hash = hash
-        print(iteration, last_hash)
+        ferry = next_ferry
+        print(iteration)
         iteration += 1
 
 

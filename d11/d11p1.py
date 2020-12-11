@@ -65,24 +65,15 @@ def next_generation(ferry):
     return next_ferry
 
 
-def get_hash(ferry):
-    return sum(i * sum(j for j, cell in enumerate(row) if cell == '#') for i, row in enumerate(ferry))
-
-
 def solve(input):
     ferry = input.strip().split('\n')
-    last_hash = None
     iteration = 0
     while True:
-        ferry = next_generation(ferry)
-        # print()
-        # for row in ferry:
-        #     print(row)
-        hash = get_hash(ferry)
-        if hash == last_hash:
+        next_ferry = next_generation(ferry)
+        if ferry == next_ferry:
             return sum(row.count('#') for row in ferry)
-        last_hash = hash
-        print(iteration, last_hash)
+        ferry = next_ferry
+        print(iteration)
         iteration += 1
 
 
