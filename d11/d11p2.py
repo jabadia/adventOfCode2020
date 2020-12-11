@@ -50,12 +50,11 @@ def find_neighbours(ferry):
                 for delta in [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
             ]))
 
-
     return neighbours
 
 
 def visible_seats(ferry, neighhbours, row, col):
-    return sum(1 for i, j in neighhbours.get((row, col), []) if ferry[i][j] == '#')
+    return sum(1 for i, j in neighhbours[(row, col)] if ferry[i][j] == '#')
 
 
 def next_generation(ferry, neighbours):
