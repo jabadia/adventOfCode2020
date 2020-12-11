@@ -20,8 +20,21 @@ L.LLLLL.LL
 ]
 
 
+def find_nearest_from(ferry, pos, delta):
+    rows = len(ferry)
+    cols = len(ferry[0])
+    neighbour = (pos[0] + delta[0], pos[1] + delta[1])
+    while 0 <= neighbour[0] < rows and 0 <= neighbour[1] < cols and ferry[neighbour[0]][neighbour[1]] == '.':
+        neighbour = (neighbour[0] + delta[0], neighbour[1] + delta[1])
+
+    if 0 <= neighbour[0] < rows and 0 <= neighbour[1] < cols:
+        return neighbour
+    else:
+        return None
+
+
 def find_neighbours(ferry):
-    neighbours = defaultdict(list)
+    neighbours = {}
     rows = len(ferry)
     cols = len(ferry[0])
     for row in range(rows):
@@ -32,64 +45,13 @@ def find_neighbours(ferry):
 
             key = (row, col)
 
-            # north
-            i = row - 1
-            while i >= 0 and ferry[i][col] == '.':
-                i -= 1
-            if i >= 0:
-                neighbours[key].append((i, col))
-            # south
-            i = row + 1
-            while i < rows and ferry[i][col] == '.':
-                i += 1
-            if i < rows:
-                neighbours[key].append((i, col))
-            # west
-            j = col - 1
-            while j >= 0 and ferry[row][j] == '.':
-                j -= 1
-            if j >= 0:
-                neighbours[key].append((row, j))
-            # east
-            j = col + 1
-            while j < cols and ferry[row][j] == '.':
-                j += 1
-            if j < cols:
-                neighbours[key].append((row, j))
+            neighbours[key] = list(filter(None, [
+                find_nearest_from(ferry, (row, col), delta)
+                for delta in [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+            ]))
 
-            # diagonal NW
-            i, j = row - 1, col - 1
-            while i >= 0 and j >= 0 and ferry[i][j] == '.':
-                i -= 1
-                j -= 1
-            if i >= 0 and j >= 0:
-                neighbours[key].append((i, j))
 
-            # diagonal SW
-            i, j = row + 1, col - 1
-            while i < rows and j >= 0 and ferry[i][j] == '.':
-                i += 1
-                j -= 1
-            if i < rows and j >= 0:
-                neighbours[key].append((i, j))
-
-            # diagonal NE
-            i, j = row - 1, col + 1
-            while i >= 0 and j < cols and ferry[i][j] == '.':
-                i -= 1
-                j += 1
-            if i >= 0 and j < cols:
-                neighbours[key].append((i, j))
-
-            # diagonal SE
-            i, j = row + 1, col + 1
-            while i < rows and j < cols and ferry[i][j] == '.':
-                i += 1
-                j += 1
-            if i < rows and j < cols:
-                neighbours[key].append((i, j))
-
-    return dict(neighbours)
+    return neighbours
 
 
 def visible_seats(ferry, neighhbours, row, col):
