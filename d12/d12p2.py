@@ -1,5 +1,7 @@
 import re
 import time
+from collections import namedtuple
+
 from utils.test_case import TestCase
 from d12_input import INPUT
 
@@ -13,37 +15,49 @@ F11
 """, 286),
 ]
 
-DIRECTION = {
-    'N': 1j,
-    'S': -1j,
-    'E': 1,
-    'W': -1,
+#     N
+#     |
+# W --+-- E
+#     |
+#     S
+
+Vector = namedtuple('Vector', "x y")
+
+DELTAS = {
+    'N': Vector(0, 1),
+    'E': Vector(1, 0),
+    'S': Vector(0, -1),
+    'W': Vector(-1, 0),
 }
 
-TURN_LEFT = 1j
-TURN_RIGHT = -1j
+
+def rotate(point, side):
+    if side == 'L':  # counter clockwise
+        return Vector(-point.y, point.x)
+    else:  # clockwise
+        return Vector(point.y, -point.x)
 
 
-def move(pos, direction, distance):
-    return pos + distance * direction
+def move(pos, delta, distance):
+    return Vector(pos.x + delta.x * distance, pos.y + delta.y * distance)
 
 
 def solve(input):
-    pos = 0
-    waypoint = 10 + 1j
+    pos = Vector(0, 0)
+    waypoint = Vector(10, 1)
     for line in input.strip().split('\n'):
         instruction, distance = re.match('([NSEWLRF])(\d+)$', line).groups()
         distance = int(distance)
         if instruction in 'NSEW':
-            waypoint = move(waypoint, DIRECTION[instruction], distance)
+            waypoint = move(waypoint, DELTAS[instruction], distance)
         elif instruction == 'F':
             pos = move(pos, waypoint, distance)
         elif instruction in 'LR':
             angle = distance // 90
-            turn = TURN_LEFT if instruction == 'L' else TURN_RIGHT
-            waypoint = waypoint * (turn ** angle)
+            for i in range(angle):
+                waypoint = rotate(waypoint, instruction)
 
-    return abs(pos.real) + abs(pos.imag)
+    return abs(pos.x) + abs(pos.y)
 
 
 if __name__ == '__main__':
