@@ -41,8 +41,7 @@ def solve(input):
         elif instruction in 'LR':
             angle = distance // 90
             turn = TURN_LEFT if instruction == 'L' else TURN_RIGHT
-            for i in range(angle):
-                dir = dir * turn
+            dir = dir * (turn ** angle)
 
     return abs(pos.real) + abs(pos.imag)
 
