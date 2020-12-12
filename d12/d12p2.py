@@ -13,9 +13,6 @@ F11
 """, 286),
 ]
 
-TURN_LEFT = {'E': 'N', 'N': 'W', 'W': 'S', 'S': 'E'}
-TURN_RIGHT = {'E': 'S', 'N': 'E', 'W': 'N', 'S': 'W'}
-
 DIRECTION = {
     'N': (0, 1),
     'S': (0, -1),
@@ -46,8 +43,6 @@ def solve(input):
             else:
                 for i in range(angle):
                     waypoint = (-waypoint[1], waypoint[0])  # turn counter-clockwise
-
-        # print(pos, dir)
 
     return abs(pos[0]) + abs(pos[1])
 
