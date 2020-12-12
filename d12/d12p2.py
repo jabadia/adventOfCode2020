@@ -14,20 +14,23 @@ F11
 ]
 
 DIRECTION = {
-    'N': (0, 1),
-    'S': (0, -1),
-    'E': (1, 0),
-    'W': (-1, 0),
+    'N': 1j,
+    'S': -1j,
+    'E': 1,
+    'W': -1,
 }
+
+TURN_LEFT = 1j
+TURN_RIGHT = -1j
 
 
 def move(pos, direction, distance):
-    return pos[0] + distance * direction[0], pos[1] + distance * direction[1]
+    return pos + distance * direction
 
 
 def solve(input):
-    pos = (0, 0)
-    waypoint = (10, 1)
+    pos = 0
+    waypoint = 10 + 1j
     for line in input.strip().split('\n'):
         instruction, distance = re.match('([NSEWLRF])(\d+)$', line).groups()
         distance = int(distance)
@@ -37,14 +40,10 @@ def solve(input):
             pos = move(pos, waypoint, distance)
         elif instruction in 'LR':
             angle = distance // 90
-            if instruction == 'R':
-                for i in range(angle):
-                    waypoint = (waypoint[1], -waypoint[0])  # turn clockwise
-            else:
-                for i in range(angle):
-                    waypoint = (-waypoint[1], waypoint[0])  # turn counter-clockwise
+            turn = TURN_LEFT if instruction == 'L' else TURN_RIGHT
+            waypoint = waypoint * (turn ** angle)
 
-    return abs(pos[0]) + abs(pos[1])
+    return abs(pos.real) + abs(pos.imag)
 
 
 if __name__ == '__main__':
