@@ -13,40 +13,38 @@ F11
 """, 25),
 ]
 
-TURN_LEFT = {'E': 'N', 'N': 'W', 'W': 'S', 'S': 'E'}
-TURN_RIGHT = {'E': 'S', 'N': 'E', 'W': 'N', 'S': 'W'}
+TURN_LEFT = 1j
+TURN_RIGHT = -1j
 
 DIRECTION = {
-    'N': (0, 1),
-    'S': (0, -1),
-    'E': (1, 0),
-    'W': (-1, 0),
+    'N': 1j,
+    'S': -1j,
+    'E': 1,
+    'W': -1,
 }
 
 
 def move(pos, direction, distance):
-    return pos[0] + distance * direction[0], pos[1] + distance * direction[1]
+    return pos + distance * direction
 
 
 def solve(input):
-    pos = (0, 0)
-    dir = 'E'
+    pos = 0
+    dir = DIRECTION['E']
     for line in input.strip().split('\n'):
         instruction, distance = re.match('([NSEWLRF])(\d+)$', line).groups()
         distance = int(distance)
         if instruction in 'NSEW':
             pos = move(pos, DIRECTION[instruction], distance)
         elif instruction == 'F':
-            pos = move(pos, DIRECTION[dir], distance)
+            pos = move(pos, dir, distance)
         elif instruction in 'LR':
             angle = distance // 90
             turn = TURN_LEFT if instruction == 'L' else TURN_RIGHT
-            while angle:
-                dir = turn[dir]
-                angle -= 1
-        # print(pos, dir)
+            for i in range(angle):
+                dir = dir * turn
 
-    return abs(pos[0]) + abs(pos[1])
+    return abs(pos.real) + abs(pos.imag)
 
 
 if __name__ == '__main__':
