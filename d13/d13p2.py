@@ -43,8 +43,9 @@ def chinese_reminder_theorem_solution(buses):
     return time
 
 
-def check(time, buses):
-    return all((time + i) % bus == 0 for i, bus in buses)
+# check that the implementation solves the example in the article http://matesup.cl/portal/revista/2007/4.pdf
+# (pag 40, solución 2)
+assert 23 == chinese_reminder_theorem_solution([(2, 3), (3, 5), (2, 7)])
 
 
 def solve(input):
