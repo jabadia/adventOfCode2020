@@ -53,8 +53,8 @@ def find_neighbours(ferry):
     return neighbours
 
 
-def visible_seats(ferry, neighhbours, row, col):
-    return sum(1 for i, j in neighhbours[(row, col)] if ferry[i][j] == '#')
+def visible_seats(ferry, neighbours, row, col):
+    return sum(1 for i, j in neighbours[(row, col)] if ferry[i][j] == '#')
 
 
 def next_generation(ferry, neighbours):
