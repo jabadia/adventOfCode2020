@@ -61,17 +61,13 @@ def next_generation(ferry, neighbours):
     rows = len(ferry)
     cols = len(ferry[0])
 
-    next_ferry = []
+    next_ferry = [['.'] * cols for _ in range(rows)]
     for row in range(rows):
-        next_row = []
         for col in range(cols):
-            if ferry[row][col] == '.':
-                next_row.append('.')
-            elif ferry[row][col] == 'L':
-                next_row.append('#' if visible_seats(ferry, neighbours, row, col) == 0 else 'L')
+            if ferry[row][col] == 'L':
+                next_ferry[row][col] = '#' if visible_seats(ferry, neighbours, row, col) == 0 else 'L'
             elif ferry[row][col] == '#':
-                next_row.append('#' if visible_seats(ferry, neighbours, row, col) < 5 else 'L')
-        next_ferry.append(next_row)
+                next_ferry[row][col] = '#' if visible_seats(ferry, neighbours, row, col) < 5 else 'L'
     return next_ferry
 
 
@@ -120,7 +116,7 @@ def solve(input):
         if next_ferry == ferry:
             return sum(row.count('#') for row in ferry)
         ferry = next_ferry
-        print(iteration)
+        # print(iteration)
         iteration += 1
 
 
