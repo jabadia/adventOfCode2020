@@ -19,48 +19,27 @@ def gen_variants(addr):
     if not addr:
         yield ''
     else:
-        for variant2 in gen_variants(addr[1:]):
+        for rest in gen_variants(addr[1:]):
             if addr[0] == 'X':
-                yield '0' + variant2
-                yield '1' + variant2
+                yield '0' + rest
+                yield '1' + rest
             else:
-                yield addr[0] + variant2
+                yield addr[0] + rest
 
 
 def addresses(addr):
     return {int(variant, 2) for variant in gen_variants(addr)}
 
 
-print(list(gen_variants('1')))
-print(list(gen_variants('X')))
-print(list(gen_variants('X1')))
-print(list(gen_variants('1X')))
-print(list(gen_variants('X11X0')))
+assert list(gen_variants('1')) == ['1']
+assert list(gen_variants('X')) == ['0', '1']
+assert list(gen_variants('X1')) == ['01', '11']
+assert list(gen_variants('1X')) == ['10', '11']
+assert list(gen_variants('X11X0')) == ['01100', '11100', '01110', '11110']
 
 
 def pad(s):
     return '0' * (36 - len(s)) + s
-
-
-def remaining(addr, other_addr):
-    assert addr != other_addr
-    s1 = addresses(addr)
-    s2 = addresses(other_addr)
-    remaining = [pad(bin(o)[2:]) for o in set.difference(s2, s1)]
-    new_addr = ''
-    n = len(remaining)
-    for bits in zip(*remaining):
-        if bits.count('1') == n:
-            new_addr += '1'
-        elif bits.count('0') == n:
-            new_addr += '0'
-        else:
-            new_addr += 'X'
-    return pad(new_addr)
-
-
-# remaining('111', 'XXX')
-# remaining('0110010X0100XX10001X11X1X11110XX1X11', '0110010X0100XX10001X11X1X11110XX1X11')
 
 
 def solve(input):
@@ -78,9 +57,6 @@ def solve(input):
             for one_addr in addresses(masked_addr):
                 mem[one_addr] = value
 
-    # 2065709786551 too low
-    #  3858655567424 wrong
-    # 3858655568118 too high
     return sum(mem.values())
 
 
