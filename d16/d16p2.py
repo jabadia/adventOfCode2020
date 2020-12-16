@@ -34,7 +34,7 @@ def is_ticket_valid(ticket, rules):
     )
 
 
-def solve(input):
+def solve(input, test=True):
 
     # separate input into 3 sections
     rules_section, my_ticket_section, nearby_tickets_section = input.strip().split('\n\n')
@@ -90,6 +90,9 @@ def solve(input):
     # parse my ticket
     my_ticket = [int(n) for n in my_ticket_section.strip().split('\n')[1].split(',')]
 
+    if test:
+        return [name for col_index, name in sorted(solved_fields.items())]
+
     # return solution
     return math.prod(
         my_ticket[col_index]
@@ -104,6 +107,6 @@ if __name__ == '__main__':
         case.check(result)
 
     t0 = time.time()
-    print(solve(INPUT))
+    print(solve(INPUT, test=False))
     t1 = time.time()
     print(f"{(t1 - t0) * 1000:0.1f} ms")
