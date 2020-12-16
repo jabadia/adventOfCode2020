@@ -73,19 +73,19 @@ def solve(input):
     # resolve multiple possibilities by elimination
     solved_fields = {}
     while possible_fields:
-        col, field_names = min(possible_fields.items(), key=lambda pair: len(pair[1]))
+        col_index, field_names = min(possible_fields.items(), key=lambda pair: len(pair[1]))
         assert len(field_names) == 1
         field_name = field_names.pop()
-        solved_fields[col] = field_name
-        possible_fields.pop(col)
+        solved_fields[col_index] = field_name
+        possible_fields.pop(col_index)
         for other_field_names in possible_fields.values():
             other_field_names -= {field_name}
 
     my_ticket = [int(n) for n in my_ticket_section.strip().split('\n')[1].split(',')]
 
     return math.prod(
-        my_ticket[i]
-        for i, name in solved_fields.items()
+        my_ticket[col_index]
+        for col_index, name in solved_fields.items()
         if name.startswith('departure')
     )
 
