@@ -23,10 +23,10 @@ nearby tickets:
 
 
 def is_field_valid(field_value, ranges):
-    for range_min, range_max in ranges:
-        if range_min <= field_value <= range_max:
-            return True
-    return False
+    return any(
+        range_min <= field_value <= range_max
+        for range_min, range_max in ranges
+    )
 
 
 def solve(input):
@@ -34,18 +34,23 @@ def solve(input):
     rules = {}
     for rule in rules_section.strip().split('\n'):
         field_name, ranges = rule.split(': ')
-        ranges = ranges.split(' or ')
-        ranges = [(int(n0), int(n1)) for n0, n1 in [re.match('(\d+)-(\d+)', r).groups() for r in ranges]]
-        rules[field_name] = ranges
+        rules[field_name] = [
+            (int(n0), int(n1))
+            for n0, n1 in [
+                re.match('(\d+)-(\d+)', r).groups()
+                for r in ranges.split(' or ')
+            ]
+        ]
 
-    error_rate = 0
-    for ticket in nearby_tickets_section.strip().split('\n'):
-        if ticket.startswith('nearby'):
-            continue
-        for field_value in ticket.split(','):
-            field_value = int(field_value)
-            if all(not is_field_valid(field_value, ranges) for ranges in rules.values()):
-                error_rate += field_value
+    error_rate = sum(
+        sum(
+            field_value
+            for field_value in [int(v) for v in ticket.split(',')]
+            if not any(is_field_valid(field_value, ranges) for ranges in rules.values())
+        )
+        for ticket in nearby_tickets_section.strip().split('\n')
+        if not ticket.startswith('nearby')
+    )
     return error_rate
 
 
