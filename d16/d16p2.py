@@ -39,20 +39,24 @@ def solve(input):
     rules = {}
     for rule in rules_section.strip().split('\n'):
         field_name, ranges = rule.split(': ')
-        ranges = ranges.split(' or ')
-        ranges = [(int(n0), int(n1)) for n0, n1 in [re.match('(\d+)-(\d+)', r).groups() for r in ranges]]
-        rules[field_name] = ranges
+        rules[field_name] = [
+            (int(n0), int(n1))
+            for n0, n1 in [
+                re.match('(\d+)-(\d+)', r).groups()
+                for r in ranges.split(' or ')
+            ]
+        ]
 
-    valid_tickets = []
-    for ticket in nearby_tickets_section.strip().split('\n'):
-        if ticket.startswith('nearby'):
-            continue
-        ticket = [int(field_value) for field_value in ticket.split(',')]
-        if not is_ticket_valid(ticket, rules):
-            continue
-        valid_tickets.append(ticket)
-
-    print(valid_tickets)
+    valid_tickets = [
+        ticket
+        for ticket in
+        [
+            [int(field_value) for field_value in ticket_line.split(',')]
+            for ticket_line in nearby_tickets_section.strip().split('\n')
+            if not ticket_line.startswith('nearby')
+        ]
+        if is_ticket_valid(ticket, rules)
+    ]
 
     field_count = len(valid_tickets[0])
     good_fields = defaultdict(set)
