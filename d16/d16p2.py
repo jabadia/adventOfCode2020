@@ -58,32 +58,34 @@ def solve(input):
         if is_ticket_valid(ticket, rules)
     ]
 
-    field_count = len(valid_tickets[0])
-    good_fields = defaultdict(set)
-    for field_name, ranges in rules.items():
-        for i in range(field_count):
-            is_good = all(is_field_valid(ticket[i], ranges) for ticket in valid_tickets)
-            if is_good:
-                # good_fields[field_name].add(i)
-                good_fields[i].add(field_name)
-    good_fields = dict(good_fields)
+    # find what columns can be which fields
+    columns = zip(*valid_tickets)  # transpose tickets into columns
 
-    known_fields = {}
-    while good_fields:
-        for i, field_names in good_fields.items():
-            if len(field_names) == 1:
-                field_name = field_names.pop()
-                known_fields[i] = field_name
-                good_fields.pop(i)
-                for other_field_names in good_fields.values():
-                    other_field_names -= {field_name}
-                break
+    possible_fields = {
+        col_index: set(
+            field_name
+            for field_name, ranges in rules.items()
+            if all(is_field_valid(value, ranges) for value in column)
+        )
+        for col_index, column in enumerate(columns)
+    }
+
+    # resolve multiple possibilities by elimination
+    solved_fields = {}
+    while possible_fields:
+        col, field_names = min(possible_fields.items(), key=lambda pair: len(pair[1]))
+        assert len(field_names) == 1
+        field_name = field_names.pop()
+        solved_fields[col] = field_name
+        possible_fields.pop(col)
+        for other_field_names in possible_fields.values():
+            other_field_names -= {field_name}
 
     my_ticket = [int(n) for n in my_ticket_section.strip().split('\n')[1].split(',')]
 
     return math.prod(
         my_ticket[i]
-        for i, name in known_fields.items()
+        for i, name in solved_fields.items()
         if name.startswith('departure')
     )
 
