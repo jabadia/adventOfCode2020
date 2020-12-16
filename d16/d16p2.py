@@ -35,7 +35,11 @@ def is_ticket_valid(ticket, rules):
 
 
 def solve(input):
+
+    # separate input into 3 sections
     rules_section, my_ticket_section, nearby_tickets_section = input.strip().split('\n\n')
+
+    # parse rules
     rules = {}
     for rule in rules_section.strip().split('\n'):
         field_name, ranges = rule.split(': ')
@@ -47,6 +51,7 @@ def solve(input):
             ]
         ]
 
+    # find valid tickets
     valid_tickets = [
         ticket
         for ticket in
@@ -69,6 +74,7 @@ def solve(input):
         )
         for col_index, column in enumerate(columns)
     }
+    # possible_fields = dict { key = col_index, value = set(field names) }
 
     # resolve multiple possibilities by elimination
     solved_fields = {}
@@ -81,8 +87,10 @@ def solve(input):
         for other_field_names in possible_fields.values():
             other_field_names -= {field_name}
 
+    # parse my ticket
     my_ticket = [int(n) for n in my_ticket_section.strip().split('\n')[1].split(',')]
 
+    # return solution
     return math.prod(
         my_ticket[col_index]
         for col_index, name in solved_fields.items()
