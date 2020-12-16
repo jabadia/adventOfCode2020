@@ -24,17 +24,14 @@ nearby tickets:
 
 
 def is_field_valid(field_value, ranges):
-    for range_min, range_max in ranges:
-        if range_min <= field_value <= range_max:
-            return True
-    return False
+    return any(range_min <= field_value <= range_max for range_min, range_max in ranges)
 
 
 def is_ticket_valid(ticket, rules):
-    for field_value in ticket:
-        if all(not is_field_valid(field_value, ranges) for ranges in rules.values()):
-            return False
-    return True
+    return all(
+        any(is_field_valid(field_value, ranges) for ranges in rules.values())
+        for field_value in ticket
+    )
 
 
 def solve(input):
