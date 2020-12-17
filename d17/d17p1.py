@@ -12,10 +12,10 @@ TEST_CASES = [
 ]
 
 NEIGHBOURS = [(i, j, k) for i in (-1, 0, 1) for j in (-1, 0, 1) for k in (-1, 0, 1) if not i == j == k == 0]
+BLOCK = NEIGHBOURS + [(0, 0, 0)]
 
-
-def neighbours(cell):
-    for delta in NEIGHBOURS:
+def neighbours(cell, deltas):
+    for delta in deltas:
         yield (cell[0] + delta[0], cell[1] + delta[1], cell[2] + delta[2])
 
 
@@ -29,21 +29,18 @@ def solve(input):
     for cycle in range(6):
         seen = set()
         next_world = set()
-        for cell in world:
-            seen.add(cell)
-            count = sum(neighbour in world for neighbour in neighbours(cell))
-            if count == 2 or count == 3:
-                next_world.add(cell)
-            for cell2 in neighbours(cell):
-                if cell2 not in seen:
-                    seen.add(cell2)
-                    count = sum(neighbour in world for neighbour in neighbours(cell2))
-                    if cell2 in world:  # is currently active
-                        if count == 2 or count == 3:
-                            next_world.add(cell2)
-                    else:  # is currently not active
-                        if count == 3:
-                            next_world.add(cell2)
+        for active_cell in world:
+            for nearby_cell in neighbours(active_cell, BLOCK):
+                if nearby_cell in seen:
+                    continue
+                seen.add(nearby_cell)
+                count = sum(neighbour in world for neighbour in neighbours(nearby_cell, NEIGHBOURS))
+                if nearby_cell in world:  # is currently active
+                    if count == 2 or count == 3:
+                        next_world.add(nearby_cell)
+                else:  # is currently not active
+                    if count == 3:
+                        next_world.add(nearby_cell)
         world = next_world
 
     return len(world)
