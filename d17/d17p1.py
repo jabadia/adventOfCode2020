@@ -48,6 +48,7 @@ def solve(input):
 
     return len(world)
 
+
 if __name__ == '__main__':
     for case in TEST_CASES:
         result = solve(case.case)

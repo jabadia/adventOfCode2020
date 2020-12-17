@@ -23,7 +23,12 @@ NEIGHBOURS = [
 
 def neighbours(cell):
     for delta in NEIGHBOURS:
-        yield (cell[0] + delta[0], cell[1] + delta[1], cell[2] + delta[2], cell[3] + delta[3])
+        yield (
+            cell[0] + delta[0],
+            cell[1] + delta[1],
+            cell[2] + delta[2],
+            cell[3] + delta[3]
+        )
 
 
 def solve(input):
@@ -54,6 +59,7 @@ def solve(input):
         world = next_world
 
     return len(world)
+
 
 if __name__ == '__main__':
     for case in TEST_CASES:
