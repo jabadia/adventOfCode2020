@@ -35,12 +35,8 @@ def solve(input):
                     continue
                 seen.add(nearby_cell)
                 count = sum(neighbour in world for neighbour in neighbours(nearby_cell, NEIGHBOURS))
-                if nearby_cell in world:  # is currently active
-                    if count == 2 or count == 3:
-                        next_world.add(nearby_cell)
-                else:  # is currently not active
-                    if count == 3:
-                        next_world.add(nearby_cell)
+                if count == 3 or (count == 2 and nearby_cell in world):
+                    next_world.add(nearby_cell)
         world = next_world
 
     return len(world)
