@@ -26,7 +26,7 @@ def solve(input):
             if cell == '#':
                 world.add((i, j, 0))
 
-    for cycle in range(0, 6):
+    for cycle in range(6):
         seen = set()
         next_world = set()
         for cell in world:
