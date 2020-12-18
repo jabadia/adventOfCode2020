@@ -37,31 +37,29 @@ term::= ( expression ) | num
 """
 
 
+# expression ::= factor * expression | factor
 def expr(tokens):
     v1 = factor(tokens)
-    if not tokens:
+
+    if tokens and tokens[0] == '*':
+        tokens.pop(0)
+        return v1 * expr(tokens)
+    else:
         return v1
 
-    token = tokens.pop(0)
-    if token == '*':
-        return v1 * expr(tokens)
 
-    tokens.insert(0, token)
-    return v1
-
-
+# factor ::= term + factor | term
 def factor(tokens):
     v1 = term(tokens)
-    if not tokens:
-        return v1
-    token = tokens.pop(0)
-    if token == '+':
+
+    if tokens and tokens[0] == '+':
+        tokens.pop(0)
         return v1 + factor(tokens)
+    else:
+        return v1
 
-    tokens.insert(0, token)
-    return v1
 
-
+# term::= ( expression ) | num
 def term(tokens):
     token = tokens.pop(0)
     if token == '(':
