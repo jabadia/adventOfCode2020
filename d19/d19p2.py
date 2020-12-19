@@ -1,4 +1,4 @@
-import regex
+import re
 import time
 
 from utils.test_case import TestCase
@@ -102,13 +102,19 @@ def solve(input):
     regex_42 = '|'.join(set(generate_values(rules, 42)))
     regex_31 = '|'.join(set(generate_values(rules, 31)))
 
-    full_regex = f'({regex_42})+({regex_31})+'
+    # https://www.regular-expressions.info/captureall.html
+    # we wrap repeated capture groups within other capture groups to be able to get the full matched length
+    # instead of just the last captured repetition
+    full_regex = f'(({regex_42})+)(({regex_31})+)'
 
     def is_valid(message, full_regex):
-        # I had to use https://pypi.org/project/regex/, because I couldn't find how to get the number of
+        matches = re.fullmatch(full_regex, message)
+        # At first, I used https://pypi.org/project/regex/, because I couldn't find how to get the number of
         # repetitions captured in each group with builit-in re, :-(
-        matches = regex.fullmatch(full_regex, message)
-        return matches and len(matches.captures(1)) > len(matches.captures(2))
+        # However, regex_42 and regex_31 always match strings of same length, so comparing the matched string length
+        # is equivalent to comparing number of captured repetitions (that we don't have), and I don't use 'regex'
+        # package anymore
+        return matches and len(matches.group(1)) > len(matches.group(3))
 
     return sum(1 for message in messages.strip().split('\n') if is_valid(message, full_regex))
 
