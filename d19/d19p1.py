@@ -80,10 +80,7 @@ def replace_regex(rules, start):
             regex += '|'
         else:
             child_regex = replace_regex(rules, int(child))
-            if '|' in child_regex:
-                regex += '(' + child_regex + ')'
-            else:
-                regex += child_regex
+            regex += '(' + child_regex + ')'
     return regex
 
 

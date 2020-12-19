@@ -57,24 +57,6 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba
 ]
 
 
-def replace_regex(rules, start):
-    if start in (8, 11):
-        return str(start)
-    regex = ''
-    for child in rules[start].split():
-        if child in 'ab':
-            regex += child
-        elif child == '|':
-            regex += '|'
-        else:
-            child_regex = replace_regex(rules, int(child))
-            if '|' in child_regex:
-                regex += '(' + child_regex + ')'
-            else:
-                regex += child_regex
-    return regex
-
-
 def generate_values(rules, start):
     for part in rules[start].split(' | '):
         if part in 'ab':
@@ -87,7 +69,7 @@ def generate_values(rules, start):
             elif len(children) == 2:
                 for v1 in generate_values(rules, int(children[0])):
                     for v2 in generate_values(rules, int(children[1])):
-                        yield v1+v2
+                        yield v1 + v2
             else:
                 assert False, 'unexpected'
 
@@ -105,38 +87,30 @@ def solve(input):
         id, rule = rule_line.strip().split(': ')
         rules[int(id)] = rule.replace('"', '')
 
-    print(1, list(generate_values(rules, 1)))
-    print(14, list(generate_values(rules, 14)))
-    print(21, list(generate_values(rules, 21)))
+    # relevant rules are:
+    # 0: 8 11
+    # 8: 42 | 42 8
+    # 11: 42 31 | 42 11 31
 
-    print(42, list(generate_values(rules, 42)))
-    print(31, list(generate_values(rules, 31)))
+    # rule 8 means: one or more repetitions of 42
+    # rule 11 means: n repetitions of 42 followed by n (same number) repetitions of 31, with n >= 1
+    #
+    # therefore rule 0 can be restated to
+    # n repetitions of rule 42 followed by m repetitions of rule 31
+    # with n > m
 
-    prefix_regex = '|'.join(generate_values(rules, 42))
-    postfix_regex = '|'.join(generate_values(rules, 31))
+    regex_42 = '|'.join(set(generate_values(rules, 42)))
+    regex_31 = '|'.join(set(generate_values(rules, 31)))
 
-    values_42 = set(generate_values(rules, 42))
-    values_31 = set(generate_values(rules, 31))
+    full_regex = f'({regex_42})+({regex_31})+'
 
-    print(set.intersection(values_31, values_42))
-
-    full_regex = f'({prefix_regex})+({postfix_regex})+'
-
-    sum = 0
-    for message in messages.strip().split('\n'):
+    def is_valid(message, full_regex):
+        # I had to use https://pypi.org/project/regex/, because I couldn't find how to get the number of
+        # repetitions captured in each group with builit-in re, :-(
         matches = regex.fullmatch(full_regex, message)
-        if matches:
-            sum += 1 if len(matches.captures(1)) > len(matches.captures(2)) else 0
-    #
-    # generate_values(regex_31)
-    #
-    # valid_31 = [1 if re.fullmatch(regex_31, message) else 0 for message in messages.strip().split('\n')]
-    # valid_42 = [1 if re.fullmatch(regex_42, message) else 0 for message in messages.strip().split('\n')]
-    # too high 401
-    # too high 390
-    # 15 tampoco
+        return matches and len(matches.captures(1)) > len(matches.captures(2))
 
-    return sum
+    return sum(1 for message in messages.strip().split('\n') if is_valid(message, full_regex))
 
 
 if __name__ == '__main__':
