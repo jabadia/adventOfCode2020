@@ -12,6 +12,7 @@ TEST_CASES = [
     TestCase("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2", 13632),
 ]
 
+
 def expr(tokens):
     total = None
     operator = None
@@ -35,9 +36,13 @@ def expr(tokens):
 
     return total
 
+
 def solve(input):
     return sum(
-        expr(line.replace('(', ' ( ').replace(')',' ) ').replace('  ', ' ').strip().split(' '))
+        expr(line.replace('(', ' ( ')
+             .replace(')', ' ) ')
+             .replace('  ', ' ')
+             .strip().split(' '))
         for line in input.strip().split('\n')
     )
 
