@@ -32,8 +32,6 @@ def solve(input):
             else:
                 possible_ingredients[allergen] &= set(ingredients)
 
-    print(possible_ingredients)
-
     # resolve multiple possibilities by elimination
     solved_ingredients = {}
     while possible_ingredients:
@@ -45,7 +43,12 @@ def solve(input):
         for other_ingredients in possible_ingredients.values():
             other_ingredients -= {ingredient}
 
-    return sum(count for ingredient, count in ingredients_count.items() if ingredient not in solved_ingredients)
+    return sum(
+        count
+        for ingredient, count in ingredients_count.items()
+        if ingredient not in solved_ingredients
+    )
+
 
 if __name__ == '__main__':
     for case in TEST_CASES:
