@@ -116,7 +116,7 @@ Tile 3079:
 ..#.###...
 ..#.......
 ..#.###...    
-""", 20899048083289)
+""", 273)
 ]
 
 EXPECTED_IMAGE = """
@@ -152,6 +152,39 @@ EXPECTED_IMAGE = """
 
 # (1951, 2311, 3079, 2729, 1427, 2473, 2971, 1489, 1171)
 
+MONSTER = [
+    '                  # ',
+    '#    ##    ##    ###',
+    ' #  #  #  #  #  #   ',
+]
+
+EXPECTED_IMAGE_WITH_MONSTER = """
+.####...#####..#...###..
+#####..#..#.#.####..#.#.
+.#.#...#.###...#.##.O#..
+#.O.##.OO#.#.OO.##.OOO##
+..#O.#O#.O##O..O.#O##.##
+...#.#..##.##...#..#..##
+#.##.#..#.#..#..##.#.#..
+.###.##.....#...###.#...
+#.####.#.#....##.#..#.#.
+##...#..#....#..#...####
+..#.##...###..#.#####..#
+....#.##.#.#####....#...
+..##.##.###.....#.##..#.
+#...#...###..####....##.
+.#.##...#.##.#.#.###...#
+#.###.#..####...##..#...
+#.###...#.##...#.##O###.
+.O##.#OO.###OO##..OOO##.
+..O#.O..O..O.#O##O##.###
+#.#..##.########..#..##.
+#.#####..#.#...##..#....
+#....##..#.#########..##
+#...#.....#..##...###.##
+#..###....##.#...##.##.#
+"""
+
 Tile = namedtuple('Tile', 'id borders ops')
 
 
@@ -176,12 +209,12 @@ def flipped_side(n):
 def rotate(tile):
     return Tile(
         tile.id,
-        (tile.borders[RIGHT], tile.borders[BOTTOM], tile.borders[LEFT], tile.borders[TOP]),
+        (tile.borders[RIGHT], flipped_side(tile.borders[BOTTOM]), tile.borders[LEFT], flipped_side(tile.borders[TOP])),
         tile.ops + ('rotate',),
     )
 
 
-assert rotate(Tile(1, (1, 2, 3, 4), ops=tuple())) == Tile(1, (2, 3, 4, 1), ops=('rotate',))
+assert rotate(Tile(1, (1, 2, 3, 4), ops=tuple())) == Tile(1, (2, 768, 4, 512), ops=('rotate',))
 
 
 def flipx(tile):
@@ -257,27 +290,53 @@ def parse_tile_pixels(tile_src, tiles):
 
 
 def find_tile(tiles, side, matching_border):
+    flipped_matching_border = flipped_side(matching_border)
     for next_tile in tiles:
-        if matching_border in next_tile.borders:
-            while next_tile.borders[side] != matching_border:
-                next_tile = rotate(next_tile)
-            return next_tile
+        if matching_border not in next_tile.borders and flipped_matching_border not in next_tile.borders:
+            continue
+        for i in range(4):
+            if next_tile.borders[side] == matching_border:
+                return next_tile
+            next_tile = rotate(next_tile)
         next_tile = flipx(next_tile)
-        if matching_border in next_tile.borders:
-            while next_tile.borders[side] != matching_border:
-                next_tile = rotate(next_tile)
-            return next_tile
-        next_tile = flipy(next_tile)
-        if matching_border in next_tile.borders:
-            while next_tile.borders[side] != matching_border:
-                next_tile = rotate(next_tile)
-            return next_tile
-    return Tile(next_tile.id, (-1,-1,-1,-1), ops=tuple())
+        for i in range(4):
+            if next_tile.borders[side] == matching_border:
+                return next_tile
+            next_tile = rotate(next_tile)
+    return Tile(next_tile.id, (-1, -1, -1, -1), ops=tuple())
     # assert False, 'not found'
 
 
+def replace_one_monster(pixels, i, j, monster, monster_height, monster_width):
+    for k in range(0, monster_height):
+        for l in range(0, monster_width):
+            if monster[k][l] == '#':
+                if pixels[i + k][j + l] != '#':
+                    return 0
+
+    # we found one, let's replace it
+    print(f'found monster on {i}, {j}')
+    for k in range(0, monster_height):
+        for l in range(0, monster_width):
+            if monster[k][l] == '#':
+                pixels[i + k][j + l] = 'O'
+    return 1
+
+
+def replace_monster(pixels, monster):
+    monster_height = len(monster)
+    monster_width = len(monster[0])
+    found_monsters = 0
+    for i in range(0, len(pixels) - monster_height):
+        for j in range(0, len(pixels[i]) - monster_width):
+            found_monsters += replace_one_monster(pixels, i, j, monster, monster_height, monster_width)
+    return found_monsters
+
+
 def arrange_puzzle(tiles, first_corner, outer_borders, image_size):
-    # as we know that all borders are unique, arranging the puzzle is just finding the next tile
+    # as we know that all borders are unique, arranging the puzzle is just finding the next tile, and placing it
+    # correctly
+
     # we start with any corner
     tiles.pop(first_corner.id)
     while first_corner.borders[TOP] not in outer_borders or first_corner.borders[LEFT] not in outer_borders:
@@ -287,13 +346,9 @@ def arrange_puzzle(tiles, first_corner, outer_borders, image_size):
         if len(puzzle) % image_size == 0:  # beginning of row
             border_above = puzzle[-image_size].borders[BOTTOM]
             next_tile = find_tile(tiles.values(), TOP, border_above)
-            if not next_tile.borders[LEFT] in outer_borders:
-                next_tile = flipx(next_tile)
         else:  ## middle of row
             border_left = puzzle[-1].borders[RIGHT]
             next_tile = find_tile(tiles.values(), LEFT, border_left)
-            if len(puzzle) < image_size and next_tile.borders[TOP] not in outer_borders or len(puzzle) >= image_size and not next_tile.borders[TOP] == puzzle[-image_size].borders[BOTTOM]:
-                next_tile = flipy(next_tile)
         puzzle.append(next_tile)
         tiles.pop(next_tile.id)
 
@@ -324,7 +379,10 @@ def solve(input):
         if 2 == len([border for border in tile.borders if border in outer_borders])
     ]
 
-    first_corner = [corner for corner in corners if corner.id == 1951][0]
+    try:
+        first_corner = flipx([corner for corner in corners if corner.id == 1951][0])
+    except IndexError:
+        first_corner = corners[0]
     # first_corner = min(corners, key=lambda t: t.id)
     puzzle = arrange_puzzle(tiles, first_corner, outer_borders, image_size)
     for row in puzzle:
@@ -336,33 +394,54 @@ def solve(input):
         print()
         print()
 
-
     print('-')
 
     transformed_tiles = {tile.id: tile for row in puzzle for tile in row}
 
-    tiles_pixels = dict(parse_tile_pixels(tile_section, transformed_tiles) for tile_section in input.strip().split('\n\n'))
+    tiles_pixels = dict(
+        parse_tile_pixels(tile_section, transformed_tiles) for tile_section in input.strip().split('\n\n'))
 
     pixels = []
     for tile_row in puzzle:
         for pixel_rows in zip(*(tiles_pixels[tile.id] for tile in tile_row)):
-            pixels.append(''.join(pixel for row in pixel_rows for pixel in row))
+            pixels.append([pixel for row in pixel_rows for pixel in row])
 
     for pixels_row in pixels:
-        print(pixels_row)
+        print(''.join(pixels_row))
 
-    print('-')
+    if image_size == 3:
+        with open('actual_image.txt', 'w') as f:
+            for pixels_row in pixels:
+                f.write(''.join(pixels_row) + '\n')
 
-    for tile_row in puzzle:
-        for tile in tile_row:
-            print(f'tile: {tile.id}')
-            for pixel_row in tiles_pixels[tile.id]:
-                print(pixel_row)
-            print()
+        assert EXPECTED_IMAGE.strip() == '\n'.join(''.join(pixels_row) for pixels_row in pixels)
 
-    assert EXPECTED_IMAGE.strip() == '\n'.join(pixels)
+    # print('-')
+    #
+    # for tile_row in puzzle:
+    #     for tile in tile_row:
+    #         print(f'tile: {tile.id}')
+    #         for pixel_row in tiles_pixels[tile.id]:
+    #             print(pixel_row)
+    #         print()
+    # pixels = pixels_flipx(pixels_rotate(pixels_rotate(pixels_rotate(pixels))))
+    pixels = [list(row) for row in pixels]
+    monsters = [MONSTER, pixels_rotate(MONSTER), pixels_rotate(pixels_rotate(MONSTER)), pixels_rotate(pixels_rotate(pixels_rotate(MONSTER)))]
+    monsters += [pixels_flipx(monster) for monster in monsters]
+    for monster in monsters:
+        found_monsters = replace_monster(pixels, monster)
+        if found_monsters:
+            break
 
-    return math.prod(corner.id for corner in corners)
+    if image_size == 3:
+        with open('actual_image_with_monster.txt', 'w') as f:
+            for pixels_row in pixels:
+                f.write(''.join(pixels_row) + '\n')
+
+        # assert EXPECTED_IMAGE_WITH_MONSTER.strip() == '\n'.join(''.join(pixels_row) for pixels_row in pixels)
+
+    # return math.prod(corner.id for corner in corners)
+    return ''.join(''.join(row) for row in pixels).count('#')
 
 
 if __name__ == '__main__':
