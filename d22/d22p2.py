@@ -22,29 +22,22 @@ Player 2:
 7
 10
 """, 291),
-    #     TestCase("""
-    # Player 1:
-    # 43
-    # 19
-    #
-    # Player 2:
-    # 2
-    # 29
-    # 14
-    # """, None)
 ]
 
-i = 0
-def next_game_index():
-    global i
-    i += 1
-    return i
+
+class GameIndex:
+    def __init__(self):
+        self.index = 0
+
+    def next(self):
+        self.index += 1
+        return self.index
 
 
-def recursive_combat(player1_cards, player2_cards, out):
+def recursive_combat(player1_cards, player2_cards, out, gen_game_index):
     seen_games = set()
 
-    game_index = next_game_index()
+    game_index = gen_game_index.next()
     print(f'=== Game {game_index} ===', file=out)
     turn = 1
 
@@ -70,7 +63,8 @@ def recursive_combat(player1_cards, player2_cards, out):
             p1_won = recursive_combat(
                 deque(islice(player1_cards, 0, p1_card)),
                 deque(islice(player2_cards, 0, p2_card)),
-                out
+                out,
+                gen_game_index
             )
             print(f'\n...anyway, back to game {game_index}.', file=out)
 
@@ -90,20 +84,18 @@ def recursive_combat(player1_cards, player2_cards, out):
 
 
 def solve(input):
-    global i
-
     players = [None]
     for player_cards in input.strip().split('\n\n'):
         cards = deque(int(card) for card in player_cards.strip().split('\n')[1:])
         players.append(cards)
 
-    i = 0
+    gen_game_index = GameIndex()
     with open('actual_gameplay.txt', 'w') as out:
-        p1_won = recursive_combat(players[1], players[2], out)
+        recursive_combat(players[1], players[2], out, gen_game_index)
 
-        print(f"== Post-game results ==", file=out)
-        print(f"Player 1's deck: {', '.join(str(card) for card in players[1])}", file=out)
-        print(f"Player 2's deck: {', '.join(str(card) for card in players[2])}", file=out)
+        print(f"\n\n== Post-game results ==", file=out)
+        print(f"Player 1's deck: {', '.join(str(card) for card in players[1])}".strip(), file=out)
+        print(f"Player 2's deck: {', '.join(str(card) for card in players[2])}".strip(), file=out)
 
     return sum([(i + 1) * card for i, card in enumerate(reversed(players[1] or players[2]))])
 
@@ -117,8 +109,3 @@ if __name__ == '__main__':
     print(solve(INPUT))
     t1 = time.time()
     print(f"{(t1 - t0) * 1000:0.1f} ms")
-
-    # 32360  too low
-
-    out.flush()
-    out.close()
