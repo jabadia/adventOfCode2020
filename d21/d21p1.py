@@ -17,13 +17,11 @@ sqjhc mxmxvkd sbzzf (contains fish)
 
 def solve(input):
     possible_ingredients = {}
-    foods = []
     ingredients_count = Counter()
     for food in input.strip().split('\n'):
         ingredients, allergens = re.fullmatch('(.*) \(contains (.*)\)', food).groups()
         ingredients = ingredients.split()
         allergens = allergens.split(', ')
-        foods.append(set(ingredients))
         for ingredient in ingredients:
             ingredients_count[ingredient] += 1
         for allergen in allergens:

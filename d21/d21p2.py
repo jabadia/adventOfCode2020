@@ -46,7 +46,6 @@ def solve(input):
             sorted(
                 (allergen, ingredient)
                 for ingredient, allergen in solved_ingredients.items()
-                if ingredient in solved_ingredients
             )
         )
     )
