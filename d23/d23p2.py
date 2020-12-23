@@ -12,13 +12,19 @@ TEST_CASES = [
     # TestCase('389125467', 149245887792)
 ]
 
+ONE_MILLION = 1000000
 
 def solve(input):
     cups = deque(int(d) for d in input.strip())
     min_cup = min(cups)
     max_cup = max(cups)
+    for i in range(max_cup, ONE_MILLION):
+        cups.append(i+1)
+    max_cup = max(cups)
 
-    for round in range(100):
+    for round in range(10 * ONE_MILLION):
+        if round % 100 == 0:
+            print(round)
         current_cup = cups.popleft()
         pick = [cups.popleft() for i in range(3)]
         cups.appendleft(current_cup)
@@ -27,15 +33,18 @@ def solve(input):
             search_for -= 1
             if search_for < min_cup:
                 search_for = max_cup
-        destination_pos = cups.index(search_for)
+        cups.rotate(-cups.index(search_for)-1)
         for p in reversed(pick):
-            cups.insert(destination_pos + 1, p)
-        cups.rotate(-1)
-        # print(round, ''.join(str(cup) for cup in cups))
+            cups.appendleft(p)
+        # while cups[-1] != current_cup:
+        #     cups.rotate(1)
+        cups.rotate(-cups.index(current_cup)-1)
+        # print(round, ','.join(str(cup) for cup in islice(cups, 0, 50)))
 
     cups.rotate(-cups.index(1))
     cups.popleft()
-    return ''.join(str(cup) for cup in cups)
+    # return ''.join(str(cup) for cup in cups)
+    return cups.popleft() * cups.popleft()
 
 
 if __name__ == '__main__':
