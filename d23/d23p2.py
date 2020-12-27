@@ -26,15 +26,16 @@ def solve(input):
         if round % ONE_MILLION == 0:
             print(round)
         pick = [next[current_cup], next[next[current_cup]], next[next[next[current_cup]]]]
-        search_for = current_cup - 1
-        while search_for in pick or search_for == 0:
-            search_for -= 1
-            if search_for < 1:
-                search_for = ONE_MILLION
-        after = next[search_for]
+        insert_after = current_cup - 1
+        while insert_after in pick or insert_after == 0:
+            insert_after -= 1
+            if insert_after < 1:
+                insert_after = ONE_MILLION
+        next_insert_after = next[insert_after]
+        next[insert_after] = pick[0]
         next[current_cup] = next[pick[-1]]
-        next[search_for] = pick[0]
-        next[pick[-1]] = after
+        next[pick[-1]] = next_insert_after
+
         current_cup = next[current_cup]
 
     return next[1] * next[next[1]]
