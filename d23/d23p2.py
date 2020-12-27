@@ -3,48 +3,41 @@ import time
 
 from utils.test_case import TestCase
 from d23_input import INPUT
-from collections import deque
-from itertools import islice
 
 TEST_CASES = [
-    TestCase('389125467', '67384529'),
-    TestCase('364289715', '98645732'),
-    # TestCase('389125467', 149245887792)
+    TestCase('389125467', 149245887792),
 ]
 
 ONE_MILLION = 1000000
 
+
 def solve(input):
-    cups = deque(int(d) for d in input.strip())
-    min_cup = min(cups)
-    max_cup = max(cups)
-    for i in range(max_cup, ONE_MILLION):
-        cups.append(i+1)
-    max_cup = max(cups)
+    initial_cups = [int(d) for d in input.strip()]
+
+    next = [None] * (ONE_MILLION + 1)
+    for cup, next_cup in zip(
+            initial_cups + list(range(max(initial_cups) + 1, ONE_MILLION + 1)),
+            initial_cups[1:] + list(range(max(initial_cups) + 1, ONE_MILLION + 1)) + [initial_cups[0]]):
+        next[cup] = next_cup
+
+    current_cup = initial_cups[0]
 
     for round in range(10 * ONE_MILLION):
-        if round % 100 == 0:
+        if round % ONE_MILLION == 0:
             print(round)
-        current_cup = cups.popleft()
-        pick = [cups.popleft() for i in range(3)]
-        cups.appendleft(current_cup)
+        pick = [next[current_cup], next[next[current_cup]], next[next[next[current_cup]]]]
         search_for = current_cup - 1
         while search_for in pick or search_for == 0:
             search_for -= 1
-            if search_for < min_cup:
-                search_for = max_cup
-        cups.rotate(-cups.index(search_for)-1)
-        for p in reversed(pick):
-            cups.appendleft(p)
-        # while cups[-1] != current_cup:
-        #     cups.rotate(1)
-        cups.rotate(-cups.index(current_cup)-1)
-        # print(round, ','.join(str(cup) for cup in islice(cups, 0, 50)))
+            if search_for < 1:
+                search_for = ONE_MILLION
+        after = next[search_for]
+        next[current_cup] = next[pick[-1]]
+        next[search_for] = pick[0]
+        next[pick[-1]] = after
+        current_cup = next[current_cup]
 
-    cups.rotate(-cups.index(1))
-    cups.popleft()
-    # return ''.join(str(cup) for cup in cups)
-    return cups.popleft() * cups.popleft()
+    return next[1] * next[next[1]]
 
 
 if __name__ == '__main__':
