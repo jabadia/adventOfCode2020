@@ -38,7 +38,7 @@ def solve(input):
         else:
             players[2].extend([p2_card, p1_card])
 
-    return sum([(i+1) * card for i, card in enumerate(reversed(players[1] or players[2]))])
+    return sum((i+1) * card for i, card in enumerate(reversed(players[1] or players[2])))
 
 
 if __name__ == '__main__':
