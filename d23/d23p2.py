@@ -13,11 +13,13 @@ ONE_MILLION = 1000000
 
 def solve(input):
     initial_cups = [int(d) for d in input.strip()]
+    rest_of_cups = list(range(max(initial_cups) + 1, ONE_MILLION + 1))
 
     next = [None] * (ONE_MILLION + 1)
     for cup, next_cup in zip(
-            initial_cups + list(range(max(initial_cups) + 1, ONE_MILLION + 1)),
-            initial_cups[1:] + list(range(max(initial_cups) + 1, ONE_MILLION + 1)) + [initial_cups[0]]):
+            initial_cups + rest_of_cups,
+            initial_cups[1:] + rest_of_cups + [initial_cups[0]]
+    ):
         next[cup] = next_cup
 
     current_cup = initial_cups[0]
