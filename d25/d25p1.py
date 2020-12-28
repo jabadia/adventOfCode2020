@@ -33,7 +33,12 @@ def solve(input):
     card_key, door_key = [int(key) for key in input.strip().split('\n')]
     card_loop_size = find_loop(card_key, 7)
     door_loop_size = find_loop(door_key, 7)
-    return card_loop_size, door_loop_size, apply_loop(card_loop_size, door_key)
+    if card_loop_size < door_loop_size:
+        encryption_key = apply_loop(card_loop_size, door_key)
+    else:
+        encryption_key = apply_loop(door_loop_size, card_key)
+
+    return card_loop_size, door_loop_size, encryption_key
 
 
 if __name__ == '__main__':
