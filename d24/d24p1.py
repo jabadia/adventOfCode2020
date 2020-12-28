@@ -57,8 +57,11 @@ def move(pos, step):
 def solve(input):
     black = set()
     for line in input.strip().split('\n'):
-        steps = line.replace('se', SE).replace('sw', SW).replace('nw', NW).replace('ne', NE).replace('e', E).replace(
-            'w', W)
+        steps = (line
+            .replace('se', SE).replace('sw', SW)
+            .replace('nw', NW).replace('ne', NE)
+            .replace('e', E).replace('w', W)
+        )
         pos = (0, 0, 0)
         for step in steps:
             pos = move(pos, DIRECTIONS[step])
